@@ -1,10 +1,8 @@
-// routes/authRoutes.js
 const express = require('express');
 const router = express.Router();
+const { register } = require('../controllers/authController');
 
-// FIXED: just '/test' (NOT '/api/test')
-router.get('/test', (req, res) => {
-    res.json({ message: 'Backend is working!' });
-});
+// Signup route
+router.post('/signup', register);
 
 module.exports = router;
