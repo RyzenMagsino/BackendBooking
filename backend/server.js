@@ -12,7 +12,14 @@ app.use(express.json());
 
 // Use the authRoutes for routes starting with '/api'
 app.use('/api/auth', authRoutes);  // Mounting the auth routes
-app.use('/api', bookingRoutes);  // Mounting the booking routes
+app.use('/api/bookings', bookingRoutes);  // Mounting the booking routes
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    error: 'Internal Server Error'
+  });
 
 const PORT = process.env.PORT || 3000;
 const DB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/';
