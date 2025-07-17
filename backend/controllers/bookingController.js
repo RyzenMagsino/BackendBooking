@@ -21,6 +21,16 @@ exports.getBookingsByUser = async (req, res) => {
   }
 };
 
+// Get all bookings for a user
+exports.getBookingsByUser = async (req, res) => {
+  try {
+    const bookings = await Booking.find({ userId: req.params.userId });
+    res.status(200).json(bookings);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // Cancel a booking (soft delete or status update can be added if needed)
 exports.deleteBooking = async (req, res) => {
   try {
