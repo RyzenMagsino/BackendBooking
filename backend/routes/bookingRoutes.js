@@ -9,5 +9,6 @@ const {
 router.post('/bookings', createBooking);
 router.get('/bookings/:userId', getBookingsByUser);
 router.delete('/bookings/:id', deleteBooking);
+router.get('/bookings/:userId', getBookingsByUser);
 
 module.exports = router;
