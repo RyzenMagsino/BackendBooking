@@ -66,4 +66,38 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { register, login };
+const changePassword = async (req, res) => {
+    try {
+        const { username, oldPassword, newPassword, confirmNewPassword } = req.body;
+
+        if (!username || !oldPassword || !newPassword || !confirmNewPassword) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({ message: 'New passwords do not match' });
+        }
+
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Old password is incorrect' });
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedNewPassword;
+
+        await user.save();
+        res.status(200).json({ message: 'Password changed successfully' });
+
+    } catch (err) {
+        console.error('Change Password Error:', err);
+        res.status(500).json({ message: 'Server error while changing password' });
+    }
+};
+
+module.exports = { register, login, changePassword };
