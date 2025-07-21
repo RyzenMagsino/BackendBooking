@@ -90,24 +90,42 @@ const changePassword = async (req, res) => {
     try {
         const { username, oldPassword, newPassword, confirmNewPassword } = req.body;
 
+        // Basic Validation
         if (!username || !oldPassword || !newPassword || !confirmNewPassword) {
             return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        if (typeof username !== 'string' || username.length < 3) {
+            return res.status(400).json({ message: 'Username must be at least 3 characters' });
+        }
+
+        if (typeof newPassword !== 'string' || newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters' });
+        }
+
+        // Strong Password: Require at least one uppercase and one number
+        const strongPasswordRegex = /^(?=.*[A-Z])(?=.*\d).+$/;
+        if (!strongPasswordRegex.test(newPassword)) {
+            return res.status(400).json({ message: 'New password must contain at least one uppercase letter and one number' });
         }
 
         if (newPassword !== confirmNewPassword) {
             return res.status(400).json({ message: 'New passwords do not match' });
         }
 
+        // User Check
         const user = await User.findOne({ username });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        // 🔑 Old Password Check
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Old password is incorrect' });
         }
 
+        // Update Password
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedNewPassword;
 
